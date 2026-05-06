@@ -1,0 +1,6 @@
+@VetiCare.API_HostAddress = http://localhost:5183
+
+GET {{VetiCare.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
