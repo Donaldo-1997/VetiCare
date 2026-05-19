@@ -12,7 +12,7 @@ using VetiCare.DataAccess.Context;
 namespace VetiCare.DataAccess.Migrations
 {
     [DbContext(typeof(VetiCareDbContext))]
-    [Migration("20260519001739_InitialCreate")]
+    [Migration("20260519011951_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace VetiCare.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.27")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -61,7 +61,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasIndex("VetId");
 
-                    b.ToTable("Appointment");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Breed", b =>
@@ -88,7 +88,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Breed");
+                    b.ToTable("Breeds", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.MedicalRecord", b =>
@@ -123,7 +123,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasIndex("AppointmentId");
 
-                    b.ToTable("MedicalRecord");
+                    b.ToTable("MedicalRecords", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Medicine", b =>
@@ -154,7 +154,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Medicine");
+                    b.ToTable("Medicines", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Owner", b =>
@@ -180,7 +180,7 @@ namespace VetiCare.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LasttName")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -193,7 +193,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Owners", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Pet", b =>
@@ -235,7 +235,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Pet");
+                    b.ToTable("Pets", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Prescription", b =>
@@ -275,7 +275,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasIndex("MedicineId");
 
-                    b.ToTable("Prescription");
+                    b.ToTable("Prescriptions", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Vet", b =>
@@ -310,7 +310,7 @@ namespace VetiCare.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Players");
+                    b.ToTable("Vets", (string)null);
                 });
 
             modelBuilder.Entity("VetiCare.Domain.Entities.Appointment", b =>

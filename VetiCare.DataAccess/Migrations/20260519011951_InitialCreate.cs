@@ -12,7 +12,7 @@ namespace VetiCare.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Breed",
+                name: "Breeds",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -24,11 +24,11 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Breed", x => x.Id);
+                    table.PrimaryKey("PK_Breeds", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Medicine",
+                name: "Medicines",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -41,11 +41,30 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Medicine", x => x.Id);
+                    table.PrimaryKey("PK_Medicines", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Players",
+                name: "Owners",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Owners", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -59,30 +78,11 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Players", x => x.Id);
+                    table.PrimaryKey("PK_Vets", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Teams",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LasttName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teams", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pet",
+                name: "Pets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -98,23 +98,23 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pet", x => x.Id);
+                    table.PrimaryKey("PK_Pets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Pet_Breed_BreedId",
+                        name: "FK_Pets_Breeds_BreedId",
                         column: x => x.BreedId,
-                        principalTable: "Breed",
+                        principalTable: "Breeds",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Pet_Teams_OwnerId",
+                        name: "FK_Pets_Owners_OwnerId",
                         column: x => x.OwnerId,
-                        principalTable: "Teams",
+                        principalTable: "Owners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Appointment",
+                name: "Appointments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -129,23 +129,23 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Appointment", x => x.Id);
+                    table.PrimaryKey("PK_Appointments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Appointment_Pet_PetId",
+                        name: "FK_Appointments_Pets_PetId",
                         column: x => x.PetId,
-                        principalTable: "Pet",
+                        principalTable: "Pets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Appointment_Players_VetId",
+                        name: "FK_Appointments_Vets_VetId",
                         column: x => x.VetId,
-                        principalTable: "Players",
+                        principalTable: "Vets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MedicalRecord",
+                name: "MedicalRecords",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -159,17 +159,17 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MedicalRecord", x => x.Id);
+                    table.PrimaryKey("PK_MedicalRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MedicalRecord_Appointment_AppointmentId",
+                        name: "FK_MedicalRecords_Appointments_AppointmentId",
                         column: x => x.AppointmentId,
-                        principalTable: "Appointment",
+                        principalTable: "Appointments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Prescription",
+                name: "Prescriptions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -184,54 +184,54 @@ namespace VetiCare.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Prescription", x => x.Id);
+                    table.PrimaryKey("PK_Prescriptions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Prescription_MedicalRecord_MedicalRecordId",
+                        name: "FK_Prescriptions_MedicalRecords_MedicalRecordId",
                         column: x => x.MedicalRecordId,
-                        principalTable: "MedicalRecord",
+                        principalTable: "MedicalRecords",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Prescription_Medicine_MedicineId",
+                        name: "FK_Prescriptions_Medicines_MedicineId",
                         column: x => x.MedicineId,
-                        principalTable: "Medicine",
+                        principalTable: "Medicines",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointment_PetId",
-                table: "Appointment",
+                name: "IX_Appointments_PetId",
+                table: "Appointments",
                 column: "PetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Appointment_VetId",
-                table: "Appointment",
+                name: "IX_Appointments_VetId",
+                table: "Appointments",
                 column: "VetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MedicalRecord_AppointmentId",
-                table: "MedicalRecord",
+                name: "IX_MedicalRecords_AppointmentId",
+                table: "MedicalRecords",
                 column: "AppointmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pet_BreedId",
-                table: "Pet",
+                name: "IX_Pets_BreedId",
+                table: "Pets",
                 column: "BreedId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pet_OwnerId",
-                table: "Pet",
+                name: "IX_Pets_OwnerId",
+                table: "Pets",
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Prescription_MedicalRecordId",
-                table: "Prescription",
+                name: "IX_Prescriptions_MedicalRecordId",
+                table: "Prescriptions",
                 column: "MedicalRecordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Prescription_MedicineId",
-                table: "Prescription",
+                name: "IX_Prescriptions_MedicineId",
+                table: "Prescriptions",
                 column: "MedicineId");
         }
 
@@ -239,28 +239,28 @@ namespace VetiCare.DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Prescription");
+                name: "Prescriptions");
 
             migrationBuilder.DropTable(
-                name: "MedicalRecord");
+                name: "MedicalRecords");
 
             migrationBuilder.DropTable(
-                name: "Medicine");
+                name: "Medicines");
 
             migrationBuilder.DropTable(
-                name: "Appointment");
+                name: "Appointments");
 
             migrationBuilder.DropTable(
-                name: "Pet");
+                name: "Pets");
 
             migrationBuilder.DropTable(
-                name: "Players");
+                name: "Vets");
 
             migrationBuilder.DropTable(
-                name: "Breed");
+                name: "Breeds");
 
             migrationBuilder.DropTable(
-                name: "Teams");
+                name: "Owners");
         }
     }
 }
