@@ -6,9 +6,9 @@ public class MedicalRecord : AuditBase
     public string? Notes { get; set; }
 
     // Foreign Key
-    public int AppointmentId { get; set; }
+    public int PetId { get; set; }
 
     // Navigation Properties
-    public Appointment Appointment { get; set; } = null!;
+    public Pet Pet { get; set; } = null!;
     public ICollection<Prescription> Prescriptions { get; set; } = new List<Prescription>();
 }
