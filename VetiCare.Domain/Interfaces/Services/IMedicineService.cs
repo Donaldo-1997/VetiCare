@@ -6,7 +6,7 @@ namespace VetiCare.Domain.Interfaces.Services
     {
         Task<IEnumerable<Medicine>> GetAllAsync();
         Task<Medicine?> GetByIdAsync(int id);
-        Task<Medicine> GetByNameAsync(string name);
+        Task<Medicine?> GetByNameAsync(string name);
         Task<Medicine> CreateAsync(Medicine medicine);
         Task UpdateAsync(int id, Medicine medicine);
         Task DeleteAsync(int id);

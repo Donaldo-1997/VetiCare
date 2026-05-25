@@ -11,9 +11,11 @@ public class Appointment : AuditBase
     // Foreign Keys
     public int PetId { get; set; }
     public int VetId { get; set; }
+    public int MedicalRecordId { get; set; }
 
     // Navigation Properties
     public Pet Pet { get; set; } = null!;
     public Vet Vet { get; set; } = null!;
+    public MedicalRecord MedicalRecord { get; set; } = null!;
     public ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
 }

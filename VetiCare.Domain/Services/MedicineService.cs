@@ -28,7 +28,7 @@ namespace VetiCare.Domain.Services
             return await _medicineRepository.GetByIdAsync(id);
         }
 
-        public async Task<Medicine> GetByNameAsync(string name)
+        public async Task<Medicine?> GetByNameAsync(string name)
         {
             _logger.LogInformation("Retrieving medicine with name {Name}", name);
             return await _medicineRepository.GetByNameAsync(name);

@@ -10,6 +10,7 @@
         public string MedicalRecordName { get; set; } = string.Empty;
         public int MedicineId { get; set; }
         public string MedicineName { get;  set; } = string.Empty;
+        
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
