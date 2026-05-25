@@ -1,8 +1,13 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using VetiCare.API.Validators;
 using VetiCare.DataAccess.Context;
 using VetiCare.DataAccess.Repositories;
+using VetiCare.Domain.Entities;
 using VetiCare.Domain.Interfaces.Repositories;
 using VetiCare.Domain.Interfaces.Services;
 using VetiCare.Domain.Services;
@@ -13,6 +18,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<VetiCareDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Identity
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<VetiCareDbContext>()
+    .AddDefaultTokenProviders();
+// JWT
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt => {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
 
 // Repositories
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -48,6 +73,7 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
