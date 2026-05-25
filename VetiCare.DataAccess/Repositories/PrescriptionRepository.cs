@@ -9,6 +9,7 @@ namespace VetiCare.DataAccess.Repositories
     {
         public PrescriptionRepository(VetiCareDbContext context) : base(context) { }
 
+
         public async Task<IEnumerable<Prescription>> GetbyMedicalRecordIdAsync(int medicalRecordId)
         {
             return await _dbSet
@@ -21,6 +22,14 @@ namespace VetiCare.DataAccess.Repositories
             return await _dbSet
                 .Where(p => p.MedicineId == medicineId)
                 .ToListAsync();
+        }
+
+        public async Task<Prescription?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _dbSet
+                .Include(p => p.MedicalRecord)
+                .Include(p => p.Medicine)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

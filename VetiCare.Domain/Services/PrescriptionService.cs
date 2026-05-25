@@ -59,6 +59,11 @@ namespace VetiCare.Domain.Services
             return await _prescriptionRepository.GetbyMedicineIdAsync(medicineId);
         }
 
+        public async Task<Prescription?> GetByIdWithDetailsAsync(int id)
+        {
+            return await _prescriptionRepository.GetByIdWithDetailsAsync(id);
+        }
+
         public async Task<Prescription> CreateAsync(Prescription prescription)
         {
             // Validar que el historial médico exista
