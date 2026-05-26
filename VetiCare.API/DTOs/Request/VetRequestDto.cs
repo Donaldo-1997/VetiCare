@@ -1,13 +1,10 @@
-﻿namespace VetiCare.Domain.Entities
+﻿namespace VetiCare.API.DTOs.Request
 {
-    public class Vet : AuditBase
+    public class VetRequestDTO
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string LicenseNumber { get; set; } = string.Empty;
         public string Specialty { get; set; } = string.Empty;
-
-        // Navigation Property
-        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }
