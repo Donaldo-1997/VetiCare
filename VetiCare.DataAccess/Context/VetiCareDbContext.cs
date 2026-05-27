@@ -4,7 +4,9 @@ using VetiCare.Domain.Entities;
 
 namespace VetiCare.DataAccess.Context
 {
-    public class VetiCareDbContext :  IdentityDbContext<AppUser>
+
+    public class VetiCareDbContext : IdentityDbContext<AppUser>
+
     {
         public VetiCareDbContext(DbContextOptions<VetiCareDbContext> options)
             : base(options)
@@ -34,6 +36,25 @@ namespace VetiCare.DataAccess.Context
             modelBuilder.Entity<MedicalRecord>().ToTable("MedicalRecords");
             modelBuilder.Entity<Medicine>().ToTable("Medicines");
             modelBuilder.Entity<Prescription>().ToTable("Prescriptions");
+
+            modelBuilder.Entity<MedicalRecord>()
+            .HasOne(m => m.Pet)
+            .WithMany()
+            .HasForeignKey(m => m.PetId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(m => m.Appointment)
+                .WithMany(a => a.MedicalRecords)
+                .HasForeignKey(m => m.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Cortar cascada en Appointment también para evitar el mismo problema con Pet
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Pet)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.PetId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
