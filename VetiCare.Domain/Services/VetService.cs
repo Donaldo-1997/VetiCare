@@ -10,6 +10,12 @@ namespace VetiCare.Domain.Services
         private readonly IVetRepository _vetRepository;
         private readonly ILogger<VetService> _logger;
 
+        public VetService(IVetRepository vetRepository, ILogger<VetService> logger)
+        {
+            _vetRepository = vetRepository;
+            _logger = logger;
+        }
+
         public async Task<IEnumerable<Vet>> GetAllAsync()
         {
             _logger.LogInformation("Obteniendo todos los veterinarios");
