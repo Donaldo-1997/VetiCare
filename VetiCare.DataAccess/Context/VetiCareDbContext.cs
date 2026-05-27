@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using VetiCare.Domain.Entities;
 
 namespace VetiCare.DataAccess.Context
 {
-    public class VetiCareDbContext : DbContext
+    public class VetiCareDbContext :  IdentityDbContext<AppUser>
     {
         public VetiCareDbContext(DbContextOptions<VetiCareDbContext> options)
             : base(options)
