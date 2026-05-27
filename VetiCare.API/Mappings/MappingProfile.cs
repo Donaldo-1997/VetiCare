@@ -13,8 +13,7 @@ namespace VetiCare.API.Mappings
             CreateMap<VetRequestDTO, Vet>();
             CreateMap<Vet, VetResponseDTO>();
 
-
-            //Medical record mappings
+            // Medical record mappings
             CreateMap<MedicalRecordRequestDTO, MedicalRecord>();
             CreateMap<MedicalRecord, MedicalRecordResponseDTO>()
                 .ForMember(dest => dest.PetName,
@@ -24,12 +23,11 @@ namespace VetiCare.API.Mappings
                 .ForMember(dest => dest.VetName,
                     opt => opt.MapFrom(src => src.Appointment.Vet.FirstName + " " + src.Appointment.Vet.LastName));
 
-            //Medicine mappings
+            // Medicine mappings
             CreateMap<MedicineRequestDTO, Medicine>();
             CreateMap<Medicine, MedicineResponseDTO>();
 
-
-            //Prescription mappings
+            // Prescription mappings
             CreateMap<PrescriptionRequestDTO, Prescription>();
             CreateMap<Prescription, PrescriptionResponseDTO>()
                 .ForMember(dest => dest.MedicalRecordName,
@@ -37,9 +35,17 @@ namespace VetiCare.API.Mappings
                 .ForMember(dest => dest.MedicineName,
                     opt => opt.MapFrom(src => src.Medicine.Name));
 
+            // Appointment mappings
+            CreateMap<AppointmentRequestDTO, Appointment>();
+            CreateMap<Appointment, AppointmentResponseDTO>()
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.PetName,
+                    opt => opt.MapFrom(src => src.Pet != null ? src.Pet.Name : string.Empty))
+                .ForMember(dest => dest.VetName,
+                    opt => opt.MapFrom(src => src.Vet != null
+                        ? src.Vet.FirstName + " " + src.Vet.LastName
+                        : string.Empty));
         }
-
-
     }
-    
 }
