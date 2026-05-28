@@ -7,6 +7,7 @@
         public string Notes { get; set; } = string.Empty;
 
         public int PetId { get; set; }
+        public int AppointmentId { get; set; }
 
 
     }
