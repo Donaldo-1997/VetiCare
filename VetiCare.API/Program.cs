@@ -64,6 +64,17 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddValidatorsFromAssemblyContaining<MedicalRecordValidator>();
 builder.Services.AddScoped<IValidator<VetRequestDTO>, VetValidator>();
 
+// CORS — permite peticiones desde el frontend Angular
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("VetiCareFrontend", policy =>
+    {
+        policy.WithOrigins(["http://localhost:5183/", "http://localhost:4200"])
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -90,6 +101,7 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
+app.UseCors("VetiCareFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
