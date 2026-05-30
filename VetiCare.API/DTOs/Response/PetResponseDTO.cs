@@ -9,9 +9,10 @@ namespace VetiCare.API.DTOs.Response
         public DateTime BirthDate { get; set; }
         public float Weight { get; set; }
         public PetGender Gender { get; set; }
-
+        public int MedicalRecordsCount { get; set; }
         public string BreedName { get; set; } = null!;
         public string OwnerName { get; set; } = null!;
+        
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

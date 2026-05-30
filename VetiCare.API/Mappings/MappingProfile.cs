@@ -46,6 +46,30 @@ namespace VetiCare.API.Mappings
                     opt => opt.MapFrom(src => src.Vet != null
                         ? src.Vet.FirstName + " " + src.Vet.LastName
                         : string.Empty));
+            //Owner mappings
+            // Owner mappings
+            CreateMap<OwnerRequestDTO, Owner>();
+            CreateMap<Owner, OwnerResponseDTO>();
+
+            // Pet mappings
+            CreateMap<PetRequestDTO, Pet>();
+            CreateMap<Pet, PetResponseDTO>()
+                .ForMember(dest => dest.OwnerName,
+                    opt => opt.MapFrom(src => src.Owner != null
+                        ? src.Owner.FirstName + " " + src.Owner.LastName
+                        : string.Empty))
+                .ForMember(dest => dest.BreedName,
+                    opt => opt.MapFrom(src => src.Breed != null
+                        ? src.Breed.Name
+                        : string.Empty))
+                .ForMember(dest => dest.MedicalRecordsCount,
+                    opt => opt.MapFrom(src => src.MedicalRecords != null
+                        ? src.MedicalRecords.Count
+                        : 0));
+            // Breed mappings
+            CreateMap<BreedRequestDTO, Breed>();
+            CreateMap<Breed, BreedResponseDTO>();
+
         }
     }
 }

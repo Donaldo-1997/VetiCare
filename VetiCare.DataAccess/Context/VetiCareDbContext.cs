@@ -39,7 +39,7 @@ namespace VetiCare.DataAccess.Context
 
             modelBuilder.Entity<MedicalRecord>()
             .HasOne(m => m.Pet)
-            .WithMany()
+            .WithMany(p => p.MedicalRecords)
             .HasForeignKey(m => m.PetId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -55,6 +55,7 @@ namespace VetiCare.DataAccess.Context
                 .WithMany(p => p.Appointments)
                 .HasForeignKey(a => a.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

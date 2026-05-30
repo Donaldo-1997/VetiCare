@@ -19,6 +19,7 @@ namespace VetiCare.DataAccess.Repositories
             return await _dbSet
                 .Include(p => p.Breed)
                 .Include(p => p.Owner)
+                .Include(p => p.MedicalRecords)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<IEnumerable<Pet>> GetAllWithDetailsAsync()
@@ -26,6 +27,7 @@ namespace VetiCare.DataAccess.Repositories
             return await _dbSet
                 .Include(p => p.Breed)
                 .Include(p => p.Owner)
+                .Include(p => p.MedicalRecords)
                 .ToListAsync();
         }
     }

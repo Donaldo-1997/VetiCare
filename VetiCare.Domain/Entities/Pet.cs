@@ -17,4 +17,5 @@ public class Pet : AuditBase
     public Owner Owner { get; set; } = null!;
     public Breed Breed { get; set; } = null!;
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+    public ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
 }
