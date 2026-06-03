@@ -75,7 +75,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("VetiCareFrontend", policy =>
     {
-        policy.WithOrigins(["http://localhost:5183/", "http://localhost:4200"])
+        policy.WithOrigins(["http://localhost:5183", "http://localhost:5173"])
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -106,7 +106,11 @@ if (app.Environment.IsDevelopment())
 
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
-app.UseHttpsRedirection();
+// Solo redirigir HTTPS en producción — en desarrollo Angular usa HTTP
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("VetiCareFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
