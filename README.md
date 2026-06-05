@@ -156,12 +156,39 @@ dotnet ef database update <MigracionAnterior> --project VetiCare.DataAccess --st
 
 ---
 
+## Configuración CORS para desarrollo local
+
+El backend lee los orígenes permitidos desde el archivo `VetiCare.API/appsettings.Development.json`. Este archivo **debe existir** con la siguiente sección para que el frontend pueda hacer peticiones sin errores de CORS:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5173"
+    ]
+  }
+}
+```
+
+El puerto `5173` es el que Vite usa por defecto. Si Vite arranca en otro puerto (lo indica en la terminal al ejecutar `npm run dev`), actualiza ese valor.
+
+> `appsettings.Development.json` ya viene en el repositorio con esta configuración. Si alguien lo elimina o no lo tiene, la política CORS quedará sin orígenes y **todos los requests desde el frontend serán bloqueados**.
+
+---
+
 ## Variables de entorno relevantes
 
 | Variable | Archivo | Descripción |
 |---|---|---|
 | `ConnectionStrings:DefaultConnection` | `appsettings.json` | Cadena de conexión a SQL Server |
 | `Jwt:SecretKey` | `appsettings.json` | Clave secreta para firmar tokens JWT |
+| `Cors:AllowedOrigins` | `appsettings.Development.json` | Orígenes permitidos por la política CORS |
 | `VITE_API_URL` | `veticare-frontend-react/.env` | URL base de la API consumida por React |
 
 > **Producción:** nunca subas `appsettings.json` con secretos reales. Usa `appsettings.Production.json` o variables de entorno del sistema.

@@ -71,11 +71,15 @@ builder.Services.AddValidatorsFromAssemblyContaining<MedicalRecordValidator>();
 builder.Services.AddScoped<IValidator<VetRequestDTO>, VetValidator>();
 
 // CORS — permite peticiones desde el frontend Angular
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("VetiCareFrontend", policy =>
     {
-        policy.WithOrigins(["http://localhost:5183", "http://localhost:5173"])
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

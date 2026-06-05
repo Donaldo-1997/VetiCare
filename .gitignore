@@ -362,3 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 veticare-frontend-react/.env
+
+# Configuración local de desarrollo (contiene valores sensibles)
+**/appsettings.Development.json
+/VetiCare.API/appsettings.Development.json
