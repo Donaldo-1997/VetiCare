@@ -5,6 +5,7 @@ namespace VetiCare.Domain.Interfaces.Repositories
 {
     public interface IAppointmentRepository : IGenericRepository<Appointment>
     {
+        Task<IEnumerable<Appointment>> GetAllWithDetailsAsync();
         /// <summary>Devuelve una cita con Pet, Vet y MedicalRecords cargados.</summary>
         Task<Appointment?> GetWithDetailsAsync(int id);
 

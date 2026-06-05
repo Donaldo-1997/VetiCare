@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -28,6 +29,7 @@ import { useNotification } from '../../core/context/NotificationContext';
 import PageHeader from '../../shared/components/PageHeader';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import PetFormDialog from './PetFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 export default function PetList() {
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ export default function PetList() {
   const load = async () => {
     setLoading(true);
     try { setAllPets((await petService.getAll()) ?? []); }
-    catch { error('Error al cargar mascotas'); }
+    catch (err) { error(parseApiError(err, 'Error al cargar mascotas')); }
     finally { setLoading(false); }
   };
 
@@ -69,18 +71,20 @@ export default function PetList() {
 
   const paged = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+  console.log(paged);
+
   const handleSave = async (data: PetRequest) => {
     try {
       if (editing) { await petService.update(editing.id, data); success('Mascota actualizada'); }
       else         { await petService.create(data);             success('Mascota creada');     }
       setFormOpen(false); load();
-    } catch { error('Error al guardar'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar mascota')); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try { await petService.delete(deleteTarget.id); success('Mascota eliminada'); load(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar mascota')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -116,7 +120,8 @@ export default function PetList() {
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 6 }}><CircularProgress /></Box>
       ) : (
         <Paper>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
@@ -147,8 +152,8 @@ export default function PetList() {
                       }} />
                   </TableCell>
                   <TableCell>{p.weight} kg</TableCell>
-                  <TableCell>{p.owner ? `${p.owner.firstName} ${p.owner.lastName}` : '—'}</TableCell>
-                  <TableCell>{p.breed?.name ?? '—'}</TableCell>
+                  <TableCell>{p.ownerName ? `${p.ownerName}` : '—'}</TableCell>
+                  <TableCell>{`${p.breedName ?? '—'}`}</TableCell>
                   <TableCell>
                     <Tooltip title="Ver historial">
                       <IconButton color="secondary" onClick={() => navigate(`/pets/${p.id}`)}>
@@ -170,6 +175,7 @@ export default function PetList() {
               ))}
             </TableBody>
           </Table>
+          </TableContainer>
           <TablePagination
             component="div"
             count={filtered.length}

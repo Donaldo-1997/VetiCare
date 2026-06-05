@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -101,7 +102,8 @@ export default function Dashboard() {
               No hay citas agendadas próximamente.
             </Typography>
           ) : (
-            <Table size="small">
+            <TableContainer>
+            <Table size="small" sx={{ minWidth: 600 }}>
               <TableHead>
                 <TableRow>
                   <TableCell>Fecha</TableCell>
@@ -115,8 +117,8 @@ export default function Dashboard() {
                 {upcoming.map(a => (
                   <TableRow key={a.id}>
                     <TableCell>{new Date(a.scheduledAt).toLocaleString('es-CO')}</TableCell>
-                    <TableCell>{a.pet?.name ?? '—'}</TableCell>
-                    <TableCell>{a.vet ? `Dr. ${a.vet.firstName} ${a.vet.lastName}` : '—'}</TableCell>
+                    <TableCell>{`${a.petName ?? '—'}`}</TableCell>
+                    <TableCell>{a.vetName ? `Dr. ${a.vetName}` : '—'}</TableCell>
                     <TableCell>{a.reason}</TableCell>
                     <TableCell>
                       <Box component="span" sx={{
@@ -131,6 +133,7 @@ export default function Dashboard() {
                 ))}
               </TableBody>
             </Table>
+            </TableContainer>
           )}
         </CardContent>
       </Card>

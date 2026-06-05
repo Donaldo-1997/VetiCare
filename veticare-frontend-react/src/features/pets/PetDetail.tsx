@@ -30,6 +30,7 @@ import { APPOINTMENT_STATUS_CONFIG } from '../../core/models/appointment.model';
 import { useNotification } from '../../core/context/NotificationContext';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import MedicalRecordFormDialog from '../medical-records/MedicalRecordFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 export default function PetDetail() {
   const { id } = useParams<{ id: string }>();
@@ -64,13 +65,13 @@ export default function PetDetail() {
       if (editingRecord) { await medicalRecordService.update(editingRecord.id, data); success('Registro actualizado'); }
       else               { await medicalRecordService.create(data);                   success('Registro creado');     }
       setRecordFormOpen(false); loadRecords();
-    } catch { error('Error al guardar el registro'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar el registro médico')); }
   };
 
   const handleDeleteRecord = async () => {
     if (!deleteTarget) return;
     try { await medicalRecordService.delete(deleteTarget.id); success('Registro eliminado'); loadRecords(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar el registro médico')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -89,7 +90,7 @@ export default function PetDetail() {
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>{pet.name}</Typography>
           <Typography variant="body2" color="textSecondary">
-            {pet.breed?.name ?? 'Raza desconocida'} · {pet.gender === 'Male' ? 'Macho' : 'Hembra'} · {pet.weight} kg
+            {`${pet.breedName ?? 'Raza desconocida'}`} · {pet.gender === 'Male' ? 'Macho' : 'Hembra'} · {pet.weight} kg
           </Typography>
         </Box>
       </Box>
@@ -106,18 +107,18 @@ export default function PetDetail() {
           <CardContent>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
               {[
-                ['Propietario', pet.owner ? `${pet.owner.firstName} ${pet.owner.lastName}` : '—'],
+                ['Propietario', pet.ownerName ? `${pet.ownerName}` : '—'],
                 ['Fecha de nacimiento', new Date(pet.birthDate).toLocaleDateString('es-CO')],
                 ['Peso', `${pet.weight} kg`],
-                ['Raza', pet.breed?.name ?? '—'],
+                ['Raza', pet.breedName ?? '—'],
                 ['Género', pet.gender === 'Male' ? 'Macho' : 'Hembra'],
                 ['Registrado', new Date(pet.createdAt).toLocaleDateString('es-CO')],
               ].map(([label, value]) => (
-                <Box key={label}>
+                <Box key={`${label}`}>
                   <Typography variant="caption" color="textSecondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    {label}
+                    {`${label}`}
                   </Typography>
-                  <Typography sx={{ fontWeight: 500 }}>{value}</Typography>
+                  <Typography sx={{ fontWeight: 500 }}>{`${value}`}</Typography>
                 </Box>
               ))}
             </Box>
@@ -225,7 +226,7 @@ export default function PetDetail() {
                           {APPOINTMENT_STATUS_CONFIG[a.status].label}
                         </Box>
                       </TableCell>
-                      <TableCell>{a.vet ? `Dr. ${a.vet.firstName} ${a.vet.lastName}` : '—'}</TableCell>
+                      <TableCell>{a.vetName ? `Dr. ${a.vetName}` : '—'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

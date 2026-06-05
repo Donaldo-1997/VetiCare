@@ -24,7 +24,7 @@ export interface AppointmentRequest {
 }
 
 export interface AppointmentStatusRequest {
-  status: AppointmentStatus;
+  status: AppointmentStatus;  // el servicio convierte internamente a número antes de enviar
 }
 
 export const APPOINTMENT_STATUS_CONFIG: Record<AppointmentStatus, { label: string; color: string; icon: string }> = {
@@ -39,4 +39,18 @@ export const APPOINTMENT_STATUS_TRANSITIONS: Record<AppointmentStatus, Appointme
   InProgress: ['Completed',  'Cancelled'],
   Completed:  [],
   Cancelled:  [],
+};
+
+export const AppointmentStatusToNumber: Record<AppointmentStatus, number> = {
+  Scheduled:  0,
+  InProgress: 1,
+  Completed:  2,
+  Cancelled:  3,
+};
+
+export const NumberToAppointmentStatus: Record<number, AppointmentStatus> = {
+  0: 'Scheduled',
+  1: 'InProgress',
+  2: 'Completed',
+  3: 'Cancelled',
 };

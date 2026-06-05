@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -24,7 +25,8 @@ import type{
   Appointment, AppointmentRequest, AppointmentStatus,
 } from '../../core/models/appointment.model';
 import { 
-  APPOINTMENT_STATUS_CONFIG, APPOINTMENT_STATUS_TRANSITIONS 
+  APPOINTMENT_STATUS_CONFIG, APPOINTMENT_STATUS_TRANSITIONS, 
+  AppointmentStatusToNumber
 } from '../../core/models/appointment.model';
 import type { Pet } from '../../core/models/pet.model';
 import type { Vet } from '../../core/models/vet.model';
@@ -32,6 +34,7 @@ import { useNotification } from '../../core/context/NotificationContext';
 import PageHeader from '../../shared/components/PageHeader';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import AppointmentFormDialog from './AppointmentFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 const STATUS_KEYS = Object.keys(APPOINTMENT_STATUS_CONFIG) as AppointmentStatus[];
 
@@ -56,7 +59,7 @@ export default function AppointmentsPage() {
   const load = async () => {
     setLoading(true);
     try { setAll((await appointmentService.getAll()) ?? []); }
-    catch { error('Error al cargar citas'); }
+    catch (err) { error(parseApiError(err, 'Error al cargar citas')); }
     finally { setLoading(false); }
   };
 
@@ -75,20 +78,18 @@ export default function AppointmentsPage() {
 
   const paged = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  console.log({ all });
-
   const handleSave = async (data: AppointmentRequest) => {
     try {
       if (editing) { await appointmentService.update(editing.id, data); success('Cita actualizada'); }
       else         { await appointmentService.create(data);             success('Cita creada');     }
       setFormOpen(false); load();
-    } catch { error('Error al guardar'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar cita')); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try { await appointmentService.delete(deleteTarget.id); success('Cita eliminada'); load(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar cita')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -99,7 +100,7 @@ export default function AppointmentsPage() {
       await appointmentService.updateStatus(menuTarget.id, { status: next });
       success(`Cita marcada como: ${APPOINTMENT_STATUS_CONFIG[next].label}`);
       load();
-    } catch { error('Error al cambiar el estado'); }
+    } catch (err) { error(parseApiError(err, 'Error al cambiar el estado')); }
   };
 
   return (
@@ -131,7 +132,8 @@ export default function AppointmentsPage() {
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 6 }}><CircularProgress /></Box>
       ) : (
         <Paper>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: 750 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Fecha / Hora</TableCell>
@@ -151,7 +153,6 @@ export default function AppointmentsPage() {
                 </TableCell></TableRow>
               ) : paged.map(a => {
                 const transitions = APPOINTMENT_STATUS_TRANSITIONS[a.status];
-                // console.log(a);
                 return (
                   <TableRow key={a.id} hover>
                     <TableCell>{new Date(a.scheduledAt).toLocaleString('es-CO')}</TableCell>
@@ -193,6 +194,7 @@ export default function AppointmentsPage() {
               })}
             </TableBody>
           </Table>
+          </TableContainer>
           <TablePagination
             component="div" count={filtered.length} page={page} rowsPerPage={rowsPerPage}
             onPageChange={(_, p) => setPage(p)}

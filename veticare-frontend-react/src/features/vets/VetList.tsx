@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -18,6 +19,7 @@ import { useNotification } from '../../core/context/NotificationContext';
 import PageHeader from '../../shared/components/PageHeader';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import VetFormDialog from './VetFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 export default function VetList() {
   const { success, error } = useNotification();
@@ -30,7 +32,7 @@ export default function VetList() {
   const load = async () => {
     setLoading(true);
     try { setVets((await vetService.getAll()) ?? []); }
-    catch { error('Error al cargar veterinarios'); }
+    catch (err) { error(parseApiError(err, 'Error al cargar veterinarios')); }
     finally { setLoading(false); }
   };
 
@@ -43,13 +45,13 @@ export default function VetList() {
       if (editing) { await vetService.update(editing.id, data); success('Veterinario actualizado'); }
       else         { await vetService.create(data);             success('Veterinario creado');     }
       setFormOpen(false); load();
-    } catch { error('Error al guardar'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar veterinario')); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try { await vetService.delete(deleteTarget.id); success('Veterinario eliminado'); load(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar veterinario')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -62,7 +64,8 @@ export default function VetList() {
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 6 }}><CircularProgress /></Box>
       ) : (
         <Paper>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: 500 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
@@ -95,6 +98,7 @@ export default function VetList() {
               ))}
             </TableBody>
           </Table>
+          </TableContainer>
         </Paper>
       )}
 

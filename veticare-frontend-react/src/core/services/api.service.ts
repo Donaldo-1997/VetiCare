@@ -23,7 +23,15 @@ async function request<T>(
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new Error(`HTTP ${res.status}: ${text}`);
+    let message = `Error ${res.status}`;
+    try {
+      const json = JSON.parse(text);
+      // Soporta formato ApiResponse { message, errors } y ProblemDetails { title, detail }
+      message = json.message || json.errors?.[0] || json.detail || json.title || message;
+    } catch {
+      if (text) message = text;
+    }
+    throw new Error(message);
   }
 
   if (res.status === 204) return undefined as T;

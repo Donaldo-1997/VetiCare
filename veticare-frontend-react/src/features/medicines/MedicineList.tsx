@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -19,6 +20,7 @@ import { useNotification } from '../../core/context/NotificationContext';
 import PageHeader from '../../shared/components/PageHeader';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import MedicineFormDialog from './MedicineFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 export default function MedicineList() {
   const { success, error } = useNotification();
@@ -31,7 +33,7 @@ export default function MedicineList() {
   const load = async () => {
     setLoading(true);
     try { setMedicines((await medicineService.getAll()) ?? []); }
-    catch { error('Error al cargar medicamentos'); }
+    catch (err) { error(parseApiError(err, 'Error al cargar medicamentos')); }
     finally { setLoading(false); }
   };
 
@@ -42,13 +44,13 @@ export default function MedicineList() {
       if (editing) { await medicineService.update(editing.id, data); success('Medicamento actualizado'); }
       else         { await medicineService.create(data);             success('Medicamento creado');     }
       setFormOpen(false); load();
-    } catch { error('Error al guardar'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar medicamento')); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try { await medicineService.delete(deleteTarget.id); success('Medicamento eliminado'); load(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar medicamento')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -61,7 +63,8 @@ export default function MedicineList() {
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 6 }}><CircularProgress /></Box>
       ) : (
         <Paper>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: 480 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
@@ -96,6 +99,7 @@ export default function MedicineList() {
               ))}
             </TableBody>
           </Table>
+          </TableContainer>
         </Paper>
       )}
 

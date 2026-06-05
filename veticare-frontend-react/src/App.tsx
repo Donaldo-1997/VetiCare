@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { es } from 'date-fns/locale';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import AppBar from '@mui/material/AppBar';
@@ -79,6 +82,7 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
       <CssBaseline />
       <NotificationProvider>
         <BrowserRouter>
@@ -109,7 +113,6 @@ export default function App() {
 
             <Box component="main" sx={{
               flexGrow: 1, p: 3, mt: 8,
-              ml: drawerOpen ? `${DRAWER_WIDTH}px` : 0,
               transition: 'margin 0.2s ease',
               minHeight: '100vh',
               bgcolor: '#f5f5f5',
@@ -129,6 +132,7 @@ export default function App() {
           </Box>
         </BrowserRouter>
       </NotificationProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

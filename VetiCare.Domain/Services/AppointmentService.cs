@@ -22,7 +22,7 @@ namespace VetiCare.Domain.Services
         public async Task<IEnumerable<Appointment>> GetAllAsync()
         {
             _logger.LogInformation("Obteniendo todas las citas");
-            return await _appointmentRepository.GetAllAsync();
+            return await _appointmentRepository.GetAllWithDetailsAsync();
         }
 
         public async Task<Appointment?> GetByIdAsync(int id)

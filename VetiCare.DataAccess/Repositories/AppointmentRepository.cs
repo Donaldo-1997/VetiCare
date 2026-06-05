@@ -11,7 +11,14 @@ namespace VetiCare.DataAccess.Repositories
         public AppointmentRepository(VetiCareDbContext context) : base(context)
         {
         }
-
+        public async Task<IEnumerable<Appointment>> GetAllWithDetailsAsync()
+        {
+            return await _context.Appointments
+                .Include(a => a.Pet)
+                .Include(a => a.Vet)
+                .OrderByDescending(a => a.ScheduledAt)
+                .ToListAsync();
+        }
         public async Task<Appointment?> GetWithDetailsAsync(int id)
         {
             return await _context.Appointments
@@ -52,5 +59,6 @@ namespace VetiCare.DataAccess.Repositories
                 .OrderBy(a => a.ScheduledAt)
                 .ToListAsync();
         }
+
     }
 }

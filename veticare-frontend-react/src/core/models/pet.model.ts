@@ -11,8 +11,8 @@ export interface Pet {
   gender: PetGender;
   ownerId: number;
   breedId: number;
-  owner?: Owner;
-  breed?: Breed;
+  ownerName?: Owner;
+  breedName?: Breed;
   createdAt: string;
   updatedAt: string | null;
 }

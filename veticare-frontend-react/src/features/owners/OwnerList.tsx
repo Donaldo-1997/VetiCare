@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
@@ -18,6 +19,7 @@ import { useNotification } from '../../core/context/NotificationContext';
 import PageHeader from '../../shared/components/PageHeader';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import OwnerFormDialog from './OwnerFormDialog';
+import { parseApiError } from '../../core/utils/error.utils';
 
 export default function OwnerList() {
   const { success, error } = useNotification();
@@ -30,7 +32,7 @@ export default function OwnerList() {
   const load = async () => {
     setLoading(true);
     try { setOwners((await ownerService.getAll()) ?? []); }
-    catch { error('Error al cargar propietarios'); }
+    catch (err) { error(parseApiError(err, 'Error al cargar propietarios')); }
     finally { setLoading(false); }
   };
 
@@ -43,13 +45,13 @@ export default function OwnerList() {
       if (editing) { await ownerService.update(editing.id, data); success('Propietario actualizado'); }
       else         { await ownerService.create(data);              success('Propietario creado');     }
       setFormOpen(false); load();
-    } catch { error('Error al guardar'); }
+    } catch (err) { error(parseApiError(err, 'Error al guardar propietario')); }
   };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try { await ownerService.delete(deleteTarget.id); success('Propietario eliminado'); load(); }
-    catch { error('Error al eliminar'); }
+    catch (err) { error(parseApiError(err, 'Error al eliminar propietario')); }
     finally { setDeleteTarget(undefined); }
   };
 
@@ -62,7 +64,8 @@ export default function OwnerList() {
         <Box sx={{ display: 'flex', justifyContent: 'center', pt: 6 }}><CircularProgress /></Box>
       ) : (
         <Paper>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: 600 }}>
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
@@ -97,6 +100,7 @@ export default function OwnerList() {
               ))}
             </TableBody>
           </Table>
+          </TableContainer>
         </Paper>
       )}
 
