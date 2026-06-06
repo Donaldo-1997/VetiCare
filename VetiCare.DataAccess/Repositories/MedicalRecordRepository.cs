@@ -28,5 +28,17 @@ namespace VetiCare.DataAccess.Repositories
                     .ThenInclude(a => a.Vet)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<MedicalRecord>> GetByPetAsync(int petId)
+        {
+            return await _dbSet
+                .Where(mr => mr.PetId == petId)
+                .Include(mr => mr.Appointment)
+                    .ThenInclude(a => a.Vet)
+                .Include(mr => mr.Prescriptions)
+                    .ThenInclude(p => p.Medicine)
+                .OrderByDescending(mr => mr.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

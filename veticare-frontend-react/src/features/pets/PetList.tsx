@@ -71,8 +71,6 @@ export default function PetList() {
 
   const paged = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  console.log(paged);
-
   const handleSave = async (data: PetRequest) => {
     try {
       if (editing) { await petService.update(editing.id, data); success('Mascota actualizada'); }

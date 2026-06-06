@@ -6,5 +6,6 @@ namespace VetiCare.Domain.Interfaces.Repositories
     {
         Task<Breed?> GetByNameAsync(string name);
         Task<IEnumerable<Breed>> GetBySpeciesAsync(string species);
+        Task<Breed?> GetByIdWithPetsAsync(int id);
     }
 }

@@ -85,16 +85,18 @@ namespace VetiCare.Domain.Services
         }
         public async Task DeleteAsync(int id)
         {
-            var existingOwner = await GetByIdAsync(id);
-            if (existingOwner == null)
+            var owner = await _ownerRepository.GetByIdWithPetsAsync(id);
+            if (owner == null)
             {
                 _logger.LogWarning("Owner with ID {OwnerId} not found for deletion", id);
                 throw new KeyNotFoundException(
                     $"No se encontró un propietario con el ID {id}");
             }
+            if (owner.Pets.Any())
+                throw new InvalidOperationException(
+                    "No se puede eliminar el propietario porque tiene mascotas registradas. Elimine primero las mascotas.");
             _logger.LogInformation("Deleting owner with ID {Id}", id);
             await _ownerRepository.DeleteAsync(id);
-
         }
     }
 }

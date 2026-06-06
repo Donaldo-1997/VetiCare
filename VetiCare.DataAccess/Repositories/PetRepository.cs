@@ -30,5 +30,12 @@ namespace VetiCare.DataAccess.Repositories
                 .Include(p => p.MedicalRecords)
                 .ToListAsync();
         }
+        public async Task<Pet?> GetByIdWithAppointmentsAsync(int id)
+        {
+            return await _dbSet
+                .Include(p => p.Appointments)
+                .Include(p => p.MedicalRecords)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
     }
 }

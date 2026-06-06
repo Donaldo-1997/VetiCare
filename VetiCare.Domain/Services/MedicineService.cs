@@ -80,6 +80,10 @@ namespace VetiCare.Domain.Services
                 throw new KeyNotFoundException(
                     $"No se encontró un medicamento con el ID {id}");
             }
+            var hasPrescriptions = await _medicineRepository.HasPrescriptionsAsync(id);
+            if (hasPrescriptions)
+                throw new InvalidOperationException(
+                    "No se puede eliminar el medicamento porque está siendo usado en prescripciones activas. Elimine primero las prescripciones.");
             _logger.LogInformation("Deleting medicine, ID: {MedicineId}", id);
             await _medicineRepository.DeleteAsync(id);
         }

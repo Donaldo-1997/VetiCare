@@ -13,6 +13,10 @@ namespace VetiCare.DataAccess.Repositories
             return await _dbSet
                 .FirstOrDefaultAsync(m => m.Name == name);
         }
-
+        public async Task<bool> HasPrescriptionsAsync(int medicineId)
+        {
+            return await _context.Set<Prescription>()
+                .AnyAsync(p => p.MedicineId == medicineId);
+        }
     }
 }

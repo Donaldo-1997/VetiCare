@@ -7,5 +7,6 @@ namespace VetiCare.Domain.Interfaces.Repositories
         Task<IEnumerable<Pet>> GetByOwnerIdAsync(int ownerId);
         Task<Pet?> GetByIdWithDetailsAsync(int id);
         Task<IEnumerable<Pet>> GetAllWithDetailsAsync();
+        Task<Pet?> GetByIdWithAppointmentsAsync(int id);
     }
 }

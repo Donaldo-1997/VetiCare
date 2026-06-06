@@ -9,6 +9,7 @@ namespace VetiCare.Domain.Interfaces.Services
         Task<MedicalRecord> CreateAsync(MedicalRecord medicalRecord);
         Task<MedicalRecord?> GetByIdWithDetailsAsync(int id);
         Task<IEnumerable<MedicalRecord>> GetAllWithDetailsAsync();
+        Task<IEnumerable<MedicalRecord>> GetByPetAsync(int petId);
         Task UpdateAsync(int id, MedicalRecord medicalRecord);
         Task DeleteAsync(int id);
 

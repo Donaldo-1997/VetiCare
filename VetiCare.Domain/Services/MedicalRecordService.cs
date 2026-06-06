@@ -50,6 +50,12 @@ namespace VetiCare.Domain.Services
             return await _medicalRecordRepository.GetAllWithDetailsAsync();
         }
 
+        public async Task<IEnumerable<MedicalRecord>> GetByPetAsync(int petId)
+        {
+            _logger.LogInformation("Retrieving medical records for pet ID: {PetId}", petId);
+            return await _medicalRecordRepository.GetByPetAsync(petId);
+        }
+
         public async Task UpdateAsync(int id, MedicalRecord medicalRecord)
         {
             var existingMedicalRecord = await _medicalRecordRepository.GetByIdAsync(id);

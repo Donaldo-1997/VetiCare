@@ -33,6 +33,13 @@ namespace VetiCare.API.Controllers
             return Ok(medicalRecordsDto);
         }
 
+        [HttpGet("pet/{petId}")]
+        public async Task<ActionResult<IEnumerable<MedicalRecordResponseDTO>>> GetByPet(int petId)
+        {
+            var records = await _medicalRecordService.GetByPetAsync(petId);
+            return Ok(_mapper.Map<IEnumerable<MedicalRecordResponseDTO>>(records));
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<MedicalRecordResponseDTO>> GetById(int id)
         {
@@ -98,6 +105,10 @@ namespace VetiCare.API.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
             }
         }
 

@@ -69,16 +69,17 @@ namespace VetiCare.Domain.Services
         }
         public async Task DeleteAsync(int id)
         {
-            var existingBreed = await GetByIdAsync(id);
-            if (existingBreed == null)
+            var breed = await _breedRepository.GetByIdWithPetsAsync(id);
+            if (breed == null)
             {
                 _logger.LogWarning("Breed with ID {Id} not found for deletion", id);
                 throw new KeyNotFoundException($"No se encontró una raza con el ID {id}");
             }
+            if (breed.Pets.Any())
+                throw new InvalidOperationException(
+                    "No se puede eliminar la raza porque tiene mascotas asociadas. Reasigne primero las mascotas a otra raza.");
             _logger.LogInformation("Deleting breed with ID {Id}", id);
             await _breedRepository.DeleteAsync(id);
-
-
         }
 
         

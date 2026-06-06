@@ -23,62 +23,137 @@ import AddIcon from '@mui/icons-material/Add';
 import { petService } from '../../core/services/pet.service';
 import { medicalRecordService } from '../../core/services/medical-record.service';
 import { appointmentService } from '../../core/services/appointment.service';
+import { prescriptionService } from '../../core/services/prescription.service';
+import { medicineService } from '../../core/services/medicine.service';
 import type { Pet } from '../../core/models/pet.model';
 import type { MedicalRecord, MedicalRecordRequest } from '../../core/models/medical-record.model';
 import type { Appointment } from '../../core/models/appointment.model';
+import type { Prescription, PrescriptionRequest } from '../../core/models/prescription.model';
+import type { Medicine } from '../../core/models/medicine.model';
 import { APPOINTMENT_STATUS_CONFIG } from '../../core/models/appointment.model';
 import { useNotification } from '../../core/context/NotificationContext';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import MedicalRecordFormDialog from '../medical-records/MedicalRecordFormDialog';
+import PrescriptionFormDialog from '../medical-records/PrescriptionFormDialog';
 import { parseApiError } from '../../core/utils/error.utils';
 
 export default function PetDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { success, error } = useNotification();
+
   const [pet, setPet]               = useState<Pet | null>(null);
   const [records, setRecords]       = useState<MedicalRecord[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [medicines, setMedicines]   = useState<Medicine[]>([]);
   const [loading, setLoading]       = useState(true);
   const [tab, setTab]               = useState(0);
+
+  // Estados registro médico
   const [recordFormOpen, setRecordFormOpen] = useState(false);
   const [editingRecord, setEditingRecord]   = useState<MedicalRecord | undefined>();
-  const [deleteTarget, setDeleteTarget]     = useState<MedicalRecord | undefined>();
+  const [deleteRecordTarget, setDeleteRecordTarget] = useState<MedicalRecord | undefined>();
+
+  // Estados prescripción
+  const [prescFormOpen, setPrescFormOpen]     = useState(false);
+  const [prescRecordId, setPrescRecordId]     = useState<number>(0);
+  const [editingPresc, setEditingPresc]       = useState<Prescription | undefined>();
+  const [deletePrescTarget, setDeletePrescTarget] = useState<Prescription | undefined>();
 
   const petId = Number(id);
 
-  const loadRecords = () => medicalRecordService.getByPet(petId).then(r => setRecords(r ?? []));
-  const loadAppointments = () => appointmentService.getByPet(petId).then(r => setAppointments(r ?? []));
+  const loadRecords = () =>
+    medicalRecordService.getByPet(petId)
+      .then(r => setRecords(r ?? []))
+      .catch(() => setRecords([]));
+
+  const loadAppointments = () =>
+    appointmentService.getByPet(petId)
+      .then(r => setAppointments(r ?? []))
+      .catch(() => setAppointments([]));
 
   useEffect(() => {
     setLoading(true);
-    petService.getById(petId).then(p => {
+    Promise.all([
+      petService.getById(petId),
+      medicineService.getAll(),
+    ]).then(([p, meds]) => {
       setPet(p);
+      setMedicines(meds ?? []);
       setLoading(false);
       loadRecords();
       loadAppointments();
     }).catch(() => setLoading(false));
   }, [petId]);
 
+  // ── Registro médico ──────────────────────────────────────────────────────
   const handleSaveRecord = async (data: MedicalRecordRequest) => {
     try {
-      if (editingRecord) { await medicalRecordService.update(editingRecord.id, data); success('Registro actualizado'); }
-      else               { await medicalRecordService.create(data);                   success('Registro creado');     }
-      setRecordFormOpen(false); loadRecords();
+      if (editingRecord) {
+        await medicalRecordService.update(editingRecord.id, data);
+        success('Registro actualizado');
+      } else {
+        await medicalRecordService.create(data);
+        success('Registro creado');
+      }
+      setRecordFormOpen(false);
+      loadRecords();
     } catch (err) { error(parseApiError(err, 'Error al guardar el registro médico')); }
   };
 
   const handleDeleteRecord = async () => {
-    if (!deleteTarget) return;
-    try { await medicalRecordService.delete(deleteTarget.id); success('Registro eliminado'); loadRecords(); }
-    catch (err) { error(parseApiError(err, 'Error al eliminar el registro médico')); }
-    finally { setDeleteTarget(undefined); }
+    if (!deleteRecordTarget) return;
+    try {
+      await medicalRecordService.delete(deleteRecordTarget.id);
+      success('Registro eliminado');
+      loadRecords();
+    } catch (err) { error(parseApiError(err, 'Error al eliminar el registro médico')); }
+    finally { setDeleteRecordTarget(undefined); }
+  };
+
+  // ── Prescripción ─────────────────────────────────────────────────────────
+  const openAddPresc = (medicalRecordId: number) => {
+    setPrescRecordId(medicalRecordId);
+    setEditingPresc(undefined);
+    setPrescFormOpen(true);
+  };
+
+  const openEditPresc = (p: Prescription, medicalRecordId: number) => {
+    setPrescRecordId(medicalRecordId);
+    setEditingPresc(p);
+    setPrescFormOpen(true);
+  };
+
+  const handleSavePresc = async (data: PrescriptionRequest) => {
+    try {
+      if (editingPresc) {
+        await prescriptionService.update(editingPresc.id, data);
+        success('Prescripción actualizada');
+      } else {
+        await prescriptionService.create(data);
+        success('Prescripción agregada');
+      }
+      setPrescFormOpen(false);
+      loadRecords();
+    } catch (err) { error(parseApiError(err, 'Error al guardar la prescripción')); }
+  };
+
+  const handleDeletePresc = async () => {
+    if (!deletePrescTarget) return;
+    try {
+      await prescriptionService.delete(deletePrescTarget.id);
+      success('Prescripción eliminada');
+      loadRecords();
+    } catch (err) { error(parseApiError(err, 'Error al eliminar la prescripción')); }
+    finally { setDeletePrescTarget(undefined); }
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }}><CircularProgress /></Box>;
   if (!pet) return <Typography>Mascota no encontrada.</Typography>;
 
-  const eligibleAppointments = appointments.filter(a => a.status === 'Completed' || a.status === 'InProgress');
+  const eligibleAppointments = appointments.filter(
+    a => a.status === 'Completed' || a.status === 'InProgress',
+  );
 
   return (
     <Box>
@@ -135,6 +210,7 @@ export default function PetDetail() {
               Nuevo Registro
             </Button>
           </Box>
+
           {records.length === 0 ? (
             <Typography color="textSecondary" sx={{ textAlign: 'center', py: 3 }}>
               No hay registros médicos para esta mascota.
@@ -142,51 +218,84 @@ export default function PetDetail() {
           ) : records.map(r => (
             <Card key={r.id} sx={{ mb: 2 }}>
               <CardContent>
+                {/* Cabecera del registro */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <Box>
-                    <Typography sx={{ fontWeight: 700 }}>{new Date(r.createdAt).toLocaleDateString('es-CO')}</Typography>
-                    <Typography variant="caption" color="textSecondary">Cita #{r.appointmentId}</Typography>
+                    <Typography sx={{ fontWeight: 700 }}>
+                      {new Date(r.createdAt).toLocaleDateString('es-CO')}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      Cita #{r.appointmentId}
+                      {(r as any).vetName ? ` · Dr. ${(r as any).vetName}` : ''}
+                    </Typography>
                   </Box>
                   <Box>
-                    <Tooltip title="Editar">
+                    <Tooltip title="Editar registro">
                       <IconButton color="primary" onClick={() => { setEditingRecord(r); setRecordFormOpen(true); }}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Eliminar">
-                      <IconButton color="error" onClick={() => setDeleteTarget(r)}><DeleteIcon /></IconButton>
+                    <Tooltip title="Eliminar registro">
+                      <IconButton color="error" onClick={() => setDeleteRecordTarget(r)}>
+                        <DeleteIcon />
+                      </IconButton>
                     </Tooltip>
                   </Box>
                 </Box>
+
                 <Typography sx={{ mt: 1 }}><strong>Diagnóstico:</strong> {r.diagnosis}</Typography>
                 <Typography><strong>Tratamiento:</strong> {r.treatment}</Typography>
                 {r.notes && <Typography><strong>Notas:</strong> {r.notes}</Typography>}
 
-                {r.prescriptions && r.prescriptions.length > 0 && (
-                  <>
-                    <Divider sx={{ my: 1.5 }} />
-                    <Typography variant="caption" color="textSecondary">PRESCRIPCIONES</Typography>
-                    <Table size="small" sx={{ mt: 1 }}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Medicamento</TableCell>
-                          <TableCell>Dosis</TableCell>
-                          <TableCell>Cantidad</TableCell>
-                          <TableCell>Instrucciones</TableCell>
+                {/* Prescripciones */}
+                <Divider sx={{ my: 1.5 }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="caption" color="textSecondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
+                    PRESCRIPCIONES {r.prescriptions && r.prescriptions.length > 0 ? `(${r.prescriptions.length})` : ''}
+                  </Typography>
+                  <Button size="small" startIcon={<AddIcon />} onClick={() => openAddPresc(r.id)}>
+                    Añadir
+                  </Button>
+                </Box>
+
+                {!r.prescriptions || r.prescriptions.length === 0 ? (
+                  <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic', py: 0.5 }}>
+                    Sin prescripciones.
+                  </Typography>
+                ) : (
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Medicamento</TableCell>
+                        <TableCell>Dosis</TableCell>
+                        <TableCell>Cantidad</TableCell>
+                        <TableCell>Instrucciones</TableCell>
+                        <TableCell align="right">Acciones</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {r.prescriptions.map(p => (
+                        <TableRow key={p.id}>
+                          <TableCell>{p.medicine?.name ?? (p as any).medicineName ?? '—'}</TableCell>
+                          <TableCell>{p.dosage}</TableCell>
+                          <TableCell>{p.quantity}</TableCell>
+                          <TableCell>{p.instructions}</TableCell>
+                          <TableCell align="right">
+                            <Tooltip title="Editar">
+                              <IconButton size="small" color="primary" onClick={() => openEditPresc(p, r.id)}>
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Eliminar">
+                              <IconButton size="small" color="error" onClick={() => setDeletePrescTarget(p)}>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
                         </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {r.prescriptions.map(p => (
-                          <TableRow key={p.id}>
-                            <TableCell>{p.medicine?.name ?? '—'}</TableCell>
-                            <TableCell>{p.dosage}</TableCell>
-                            <TableCell>{p.quantity}</TableCell>
-                            <TableCell>{p.instructions}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
@@ -236,17 +345,32 @@ export default function PetDetail() {
         </Card>
       )}
 
+      {/* Dialogs */}
       <MedicalRecordFormDialog
         open={recordFormOpen} record={editingRecord} petId={petId}
         appointments={eligibleAppointments}
         onClose={() => setRecordFormOpen(false)} onSave={handleSaveRecord} />
 
+      <PrescriptionFormDialog
+        open={prescFormOpen} prescription={editingPresc}
+        medicalRecordId={prescRecordId} medicines={medicines}
+        onClose={() => setPrescFormOpen(false)} onSave={handleSavePresc} />
+
       <ConfirmDialog
-        open={!!deleteTarget}
+        open={!!deleteRecordTarget}
         title="Eliminar registro"
-        message="¿Eliminar este registro médico?"
+        message="¿Eliminar este registro médico? También se eliminarán sus prescripciones."
         onConfirm={handleDeleteRecord}
-        onCancel={() => setDeleteTarget(undefined)} />
+        onCancel={() => setDeleteRecordTarget(undefined)} />
+
+      <ConfirmDialog
+        open={!!deletePrescTarget}
+        title="Eliminar prescripción"
+        message={deletePrescTarget
+          ? `¿Eliminar la prescripción de ${(deletePrescTarget as any).medicineName ?? 'este medicamento'}?`
+          : ''}
+        onConfirm={handleDeletePresc}
+        onCancel={() => setDeletePrescTarget(undefined)} />
     </Box>
   );
 }

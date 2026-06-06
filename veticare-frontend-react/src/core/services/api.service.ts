@@ -26,8 +26,13 @@ async function request<T>(
     let message = `Error ${res.status}`;
     try {
       const json = JSON.parse(text);
-      // Soporta formato ApiResponse { message, errors } y ProblemDetails { title, detail }
-      message = json.message || json.errors?.[0] || json.detail || json.title || message;
+      // Extrae mensajes de validación de ValidationProblemDetails:
+      // { errors: { "Field": ["msg1", "msg2"], ... } }
+      const validationMessages: string | null = json.errors && typeof json.errors === 'object' && !Array.isArray(json.errors)
+        ? (Object.values(json.errors) as string[][]).flat().join('. ')
+        : null;
+      // Soporta: { message }, ValidationProblemDetails, { detail }, { title }
+      message = json.message || validationMessages || json.detail || json.title || message;
     } catch {
       if (text) message = text;
     }

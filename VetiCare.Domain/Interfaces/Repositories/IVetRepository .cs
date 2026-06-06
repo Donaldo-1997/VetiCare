@@ -5,6 +5,6 @@ namespace VetiCare.Domain.Interfaces.Repositories
     public interface IVetRepository : IGenericRepository<Vet>
     {
         Task<IEnumerable<Vet>> GetAllVetsWithAppointmentsAsync();
-
+        Task<Vet?> GetByIdWithAppointmentsAsync(int id);
     }
 }

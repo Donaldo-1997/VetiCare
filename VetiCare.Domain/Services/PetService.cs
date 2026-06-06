@@ -76,12 +76,18 @@ namespace VetiCare.Domain.Services
 
         public async Task DeleteAsync(int id)
         {
-            var exists = await _petRepository.ExistsAsync(id);
-            if (!exists)
+            var pet = await _petRepository.GetByIdWithAppointmentsAsync(id);
+            if (pet == null)
             {
                 _logger.LogWarning("Pet with ID {Id} not found for deletion", id);
                 throw new KeyNotFoundException($"No se encontró la mascota con ID {id}");
             }
+            if (pet.Appointments.Any())
+                throw new InvalidOperationException(
+                    "No se puede eliminar la mascota porque tiene citas registradas. Elimine primero las citas.");
+            if (pet.MedicalRecords.Any())
+                throw new InvalidOperationException(
+                    "No se puede eliminar la mascota porque tiene registros médicos asociados. Elimine primero los registros médicos.");
             _logger.LogInformation("Deleting pet with ID {Id}", id);
             await _petRepository.DeleteAsync(id);
         }

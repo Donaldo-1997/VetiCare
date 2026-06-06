@@ -67,13 +67,16 @@ namespace VetiCare.Domain.Services
 
         public async Task DeleteAsync(int id)
         {
-            var existingVet = await _vetRepository.GetByIdAsync(id);
+            var vet = await _vetRepository.GetByIdWithAppointmentsAsync(id);
 
-            if (existingVet == null)
+            if (vet == null)
             {
                 _logger.LogWarning("Veterinario con ID: {Id} no encontrado para eliminación", id);
                 throw new KeyNotFoundException($"Veterinario con ID {id} no encontrado");
             }
+            if (vet.Appointments.Any())
+                throw new InvalidOperationException(
+                    "No se puede eliminar el veterinario porque tiene citas registradas. Reasigne o elimine primero las citas.");
             _logger.LogInformation("Eliminando veterinario con ID: {Id}", id);
             await _vetRepository.DeleteAsync(id);
         }

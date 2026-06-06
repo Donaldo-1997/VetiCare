@@ -17,11 +17,17 @@ namespace VetiCare.API.Mappings
             CreateMap<MedicalRecordRequestDTO, MedicalRecord>();
             CreateMap<MedicalRecord, MedicalRecordResponseDTO>()
                 .ForMember(dest => dest.PetName,
-                    opt => opt.MapFrom(src => src.Pet.Name))
+                    opt => opt.MapFrom(src => src.Pet != null ? src.Pet.Name : string.Empty))
                 .ForMember(dest => dest.OwnerName,
-                    opt => opt.MapFrom(src => src.Pet.Owner.FirstName + " " + src.Pet.Owner.LastName))
+                    opt => opt.MapFrom(src => src.Pet != null && src.Pet.Owner != null
+                        ? src.Pet.Owner.FirstName + " " + src.Pet.Owner.LastName
+                        : string.Empty))
                 .ForMember(dest => dest.VetName,
-                    opt => opt.MapFrom(src => src.Appointment.Vet.FirstName + " " + src.Appointment.Vet.LastName));
+                    opt => opt.MapFrom(src => src.Appointment != null && src.Appointment.Vet != null
+                        ? src.Appointment.Vet.FirstName + " " + src.Appointment.Vet.LastName
+                        : string.Empty))
+                .ForMember(dest => dest.Prescriptions,
+                    opt => opt.MapFrom(src => src.Prescriptions));
 
             // Medicine mappings
             CreateMap<MedicineRequestDTO, Medicine>();

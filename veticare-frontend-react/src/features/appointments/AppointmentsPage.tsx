@@ -26,7 +26,6 @@ import type{
 } from '../../core/models/appointment.model';
 import { 
   APPOINTMENT_STATUS_CONFIG, APPOINTMENT_STATUS_TRANSITIONS, 
-  AppointmentStatusToNumber
 } from '../../core/models/appointment.model';
 import type { Pet } from '../../core/models/pet.model';
 import type { Vet } from '../../core/models/vet.model';
