@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'https://localhost:7001/api';
+const TOKEN_KEY = 'veticare_token';
 
 async function request<T>(
   method: string,
@@ -15,9 +16,13 @@ async function request<T>(
     if (qs) url += `?${qs}`;
   }
 
+  const token = localStorage.getItem(TOKEN_KEY);
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 

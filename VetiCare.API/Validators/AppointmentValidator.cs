@@ -9,7 +9,7 @@ namespace VetiCare.API.Validators
         {
             RuleFor(x => x.ScheduledAt)
                 .NotEmpty().WithMessage("La fecha y hora de la cita son obligatorias.")
-                .GreaterThan(DateTime.UtcNow).WithMessage("La cita debe agendarse en una fecha futura.");
+                .Must(d => d > DateTime.Now).WithMessage("La cita debe agendarse en una fecha futura.");
 
             RuleFor(x => x.Reason)
                 .NotEmpty().WithMessage("El motivo de la cita es obligatorio.")

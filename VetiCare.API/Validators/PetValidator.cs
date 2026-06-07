@@ -9,10 +9,13 @@ namespace VetiCare.API.Validators
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage("El nombre de la mascota es obligatorio.")
                 .MaximumLength(100).WithMessage("El nombre de la mascota no puede exceder los 100 caracteres.");
+            RuleFor(p => p.OwnerId)
+                .GreaterThan(0).WithMessage("Debes indicar el propietario de la mascota.");
             RuleFor(p => p.BreedId)
                 .GreaterThan(0).WithMessage("El ID de la raza debe ser un número positivo.");
             RuleFor(p => p.BirthDate)
-                .LessThanOrEqualTo(DateTime.Now).WithMessage("La fecha de nacimiento de la mascota no puede ser en el futuro.");
+                .Must(d => d.Date <= DateTime.Today)
+                .WithMessage("La fecha de nacimiento de la mascota no puede ser en el futuro.");
             RuleFor(p => p.Weight)
                 .GreaterThan(0).WithMessage("El peso de la mascota debe ser un número positivo.");
             RuleFor(p => p.Gender)

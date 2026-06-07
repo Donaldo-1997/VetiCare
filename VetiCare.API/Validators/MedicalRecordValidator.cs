@@ -17,7 +17,8 @@ namespace VetiCare.API.Validators
             RuleFor(x => x.PetId)
                 .GreaterThan(0).WithMessage("Debes indicar la mascota");
 
-
+            RuleFor(x => x.AppointmentId)
+                .GreaterThan(0).WithMessage("Debes indicar la cita asociada");
         }
     }
 }

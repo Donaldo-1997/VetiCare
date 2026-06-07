@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VetiCare.API.DTOs.Request;
@@ -7,6 +8,7 @@ using VetiCare.Domain.Interfaces.Services;
 
 namespace VetiCare.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AppointmentsController : ControllerBase

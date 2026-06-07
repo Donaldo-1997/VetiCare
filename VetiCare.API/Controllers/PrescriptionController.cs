@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VetiCare.API.DTOs.Request;
 using VetiCare.API.DTOs.Response;
@@ -8,7 +9,8 @@ using VetiCare.Domain.Interfaces.Services;
 namespace VetiCare.API.Controllers
 {
 
-    [ApiController]
+    [Authorize]
+[ApiController]
     [Route("api/[controller]")]
     public class PrescriptionController : ControllerBase
     {

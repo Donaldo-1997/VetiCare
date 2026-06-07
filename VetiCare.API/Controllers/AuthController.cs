@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using VetiCare.API.DTOs.Auth;
 using VetiCare.Domain.Entities;
@@ -59,14 +60,25 @@ namespace VetiCare.API.Controllers
 
         private string GenerateJwtToken(AppUser user)
         {
-            var key = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]!));
+            var key   = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub,   user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+                new Claim("firstName", user.FirstName),
+                new Claim("lastName",  user.LastName),
+            };
+
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                expires: DateTime.UtcNow.AddHours(8),
+                issuer:            _config["Jwt:Issuer"],
+                audience:          _config["Jwt:Audience"],
+                claims:            claims,
+                expires:           DateTime.UtcNow.AddHours(8),
                 signingCredentials: creds);
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
